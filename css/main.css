@@ -1,0 +1,149 @@
+body{
+    height: 100vh;
+    margin: 0px;
+}
+#bgContainer{
+    background-image: url(../img/full-bg.png);
+    width: 100%;
+    height: 100vh;
+    display: block;
+    position: fixed;
+    top: 0px;
+    z-index: 3;
+    /*background-size: cover;*/
+    /*background-position: center;*/
+}
+.tvContainer{
+    width: 100%;
+    height: 100vh;
+    display: block;
+    background-size: cover;
+    background-position: left; 
+    position: fixed;
+    top: 0px;
+    opacity: 0;
+}
+#boxContainer{
+    background-image: url(../img/box.png);
+    z-index: 2;
+}
+#knobsContainer{
+    background-image: url(../img/knob.png);
+    z-index: 3;
+}
+#knobsContainerVol{
+    background-image: url(../img/knobVol.png);
+    z-index: 3;
+}
+#screenParent{
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+}
+#screenContainer{
+    background-image: url(../img/screen.png);
+    z-index: 0;
+    font-size: 1000px;
+}
+#mainText{
+    position: absolute;
+    top: 0px;
+    z-index: 1;
+    font-family: 'Poppins', sans-serif;
+    font-size: 49px;
+    text-align: center;
+    -webkit-text-stroke: 2px white;
+    font-weight: bold;
+    padding-bottom: 500px;
+}
+#knobRing{
+    position: fixed;
+    cursor: pointer;
+    z-index: 5;
+    border-radius: 100%;
+    display: none;
+}
+#knobRingVol{
+    position: fixed;
+    cursor: pointer;
+    z-index: 5;
+    border-radius: 100%;
+    display: none;
+}
+#tvBox{
+    position: fixed;
+    cursor: pointer;
+    z-index: 6;
+    display: block;
+    border-radius: 10%;
+}
+#knobRing:hover{
+    border: 3px solid #fdbf11;
+}
+#knobRingVol:hover{
+    border: 3px solid #fdbf11;
+}
+#tvBox:hover{
+    border: 3px solid #fdbf11;   
+}
+.movieContainer{
+    margin-bottom: 70px;
+}
+
+#creditsTitle{
+    font-size: 69px;
+    margin-bottom: 80px;
+    margin-top: 40px;
+}
+
+#rotateContainer{
+    display: none;
+    z-index: 10;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100vh;
+    background: white;
+}
+#rotateContainer img{
+    width: 100%;
+    padding-top: 90px;
+}
+#rotateText{
+    width: 100%;
+    text-align: center;
+    font-family: 'Poppins';
+    font-size: 30px;
+    font-weight: 600;
+    color: red;
+    margin-top: 16px;
+}
+.watchedOn{
+    font-size: 23px;
+    -webkit-text-stroke: 0px;
+    color: white;
+    font-weight: normal;
+    font-style: italic;
+}
+@media (max-width:600px) and (orientation:portrait) { 
+    #rotateContainer{
+        display: block;
+    }
+}
+@media(max-width: 600px){
+    #creditsTitle {
+        font-size: 30px;
+        margin-bottom: 20px;
+    }
+    #mainText {
+        font-size: 25px;
+        -webkit-text-stroke: 1px white;
+    }
+    .movieContainer {
+        margin-bottom: 30px;
+    }
+    .watchedOn {
+        font-size: 15px;
+    }
+}

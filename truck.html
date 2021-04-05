@@ -1,0 +1,469 @@
+<!doctype html>
+<html>
+<head>
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"> 
+
+
+
+<style type="text/css">
+body{
+  font-family: 'Josefin Sans', sans-serif;
+  background: #FFCD00;
+}
+a{
+  color: #000;
+}
+#logoContainer{
+  font-family: 'Cinzel', serif;
+  width: 450px;
+  display: inherit;
+  margin: 0 auto;
+  font-weight: bold;
+  font-size: 27px;
+  text-align: center;
+  margin-bottom: 28px;
+  letter-spacing: 1px;
+}
+#fud{
+  font-size: 58px;
+  color: #8009c6;
+  font-family: 'Josefin Sans', sans-serif;
+}
+#logoContainer img{
+  width: 100%;
+
+}
+#scheduleContainer{
+  width: 450px;
+  margin: 0 auto;
+  font-size: 26px;
+}
+.rowContainer{
+  margin-bottom: 30px;
+  font-weight: 300;
+}
+.truckDate{
+  display: inline-block;
+  float: right;
+}
+.truckName{
+  display: inline-block;
+  text-decoration: underline;
+  cursor: pointer;
+  /*float: left;*/
+  float: left;
+  clear: both;
+}
+.truckName:hover, a:hover{
+  color: #8009c6;
+}
+.truckType, .preorder{
+  color: #8009c6;
+  font-size: 14px;
+  border: 1px solid #8009c6;
+  padding: 5px;
+  margin-top: 6px;
+  border-radius: 7px;
+  overflow: hidden;
+  width: 35px;
+  white-space: nowrap;
+  cursor: pointer;
+  display: inline-block;
+    float: left;
+    clear: both;
+    margin-bottom: 30px;
+    font-weight: 400;
+}
+.preorder{
+    width: 91px;
+    float: left;
+    clear: inherit;
+    margin-left: 10px;
+    background: #8009c6;
+    font-weight: 600;
+}
+.preorder a{
+  text-decoration: none;
+  color: #FFCD00;
+}
+.truckType.drop{
+  width: 106px;
+}
+.truckType:hover{
+  background: #8009c6;
+  color: #FFCD00;
+}
+.preorder a:hover{
+  color: #fff;
+}
+.truckType span{
+  opacity: 0;
+}
+.time{
+    float: right;
+    display: inline-block;
+    font-size: 19px;
+    margin-top: 7px;
+}
+.calContainer{
+  float: right;
+  position: relative;
+}
+.add-to-calendar-checkbox{
+      text-align: right;
+    display: block;
+    font-size: 17px;
+    margin-top: 9px;
+    /*font-weight: bold;*/
+    display: none;
+}
+.icon-google, .icon-ical, .icon-outlook{
+    display: inline-block;
+    text-align: right;
+    text-decoration: none;
+    font-size: 15px;
+    line-height: 10px;
+    float: right;
+    margin-top: 12px;
+    margin-left: 19px;
+    width: 38px;
+    font-weight: bold;
+}
+.cal-img{
+    width: 21px;
+    display: block;
+    margin-bottom: 37px;
+    /* float: right; */
+    /* clear: both; */
+    margin-top: 5px;
+    position: relative;
+    left: 1px;
+}
+.cal-img.ical{
+  left: 10px;
+}
+.truckNote{
+  display: inline-block;
+  clear: left;
+  float: left;
+  font-size: 18px;
+  width: 270px;
+  font-style: italic;
+  margin-top: -13px;
+}
+@media(max-width: 480px){
+  .truckName{
+    width: 100%;
+  }
+  .truckDate, .time, .calContainer{
+    float: left;
+    clear: both;
+  }
+  .preorder{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+  }
+  .rowContainer{
+    position: relative;
+    width: 100%;
+  }
+  #scheduleContainer, #logoContainer{
+    width: 100%;
+  }
+  #logoContainer{
+    font-size: 20px;
+  }
+  #fud{
+    font-size: 45px;
+  }
+  .truckType{
+    display: none;
+  }
+  .time{
+    margin-left: 4px;
+  }
+  .calContainer{
+    margin-left: -15px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id = "logoContainer">
+
+  <img src = "img/logo-01.png"/>
+  <div>NORTH HILLS OF SLIGO CREEK</div>
+  <div id = "fud">FOOD TRUCKS</div>
+</div>
+<div id="scheduleContainer">
+</div>
+
+<script src="js/ouical.min.js"></script>
+<script src = "js/moment.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+
+<script>
+
+
+
+
+$.getJSON('https://spreadsheets.google.com/feeds/cells/1S5j1C5JdsWDolhoYdSMBJeXT9oNlC4McMHrtqYujAxs/1/public/values?alt=json', function(allData) {
+    // JSON result in `data` variable
+    var cells = allData.feed.entry,
+        headers = cells.filter(function(c){ return c.gs$cell.row == "1" }),
+        gdata = cells.filter(function(c){ return c.gs$cell.row != "1" })
+
+    var data = [],
+        colMap = {},
+        rowData = {}
+
+    for(var i = 0; i < headers.length; i++){
+      var h = headers[i]
+
+      colMap[h.gs$cell.col] = h.gs$cell.$t
+    }
+
+
+    for(var i = 0; i < gdata.length; i++){
+      var c = gdata[i]
+      var row = c.gs$cell.row,
+          col = c.gs$cell.col,
+          val = c.gs$cell.$t
+
+      if(colMap[col] == "Scheduled Date"){
+        val = moment(val)
+      }
+
+      if(!rowData.hasOwnProperty(row)){
+        rowData[row] = {}
+      }
+      rowData[row][colMap[col]] = val
+    }
+
+
+    for (const rowNum in rowData) {
+      if (rowData.hasOwnProperty(rowNum)) {
+        var rowObj = rowData[rowNum]
+        if(rowObj.hasOwnProperty("Scheduled Date")){
+          data.push(rowObj)
+        }
+      }
+    }
+
+    
+
+    data = data.sort(function(a,b){
+      return a["Scheduled Date"].format('YYYYMMDD') - b["Scheduled Date"].format('YYYYMMDD')
+    })
+
+    var truck = d3.select("#scheduleContainer")
+      .selectAll(".rowContainer")
+      .data(data)
+      .enter()
+      .append("div")
+      .attr("class", "rowContainer")
+
+    truck.append("div")
+      .attr("class", "truckName")
+      .html(function(d){
+        return "<a href = \"" + d["Truck website"] + "\" target = \"_blank\">" + d["Food truck"] + "</a>"
+      })
+
+    truck.append("div")
+      .attr("class", "truckDate")
+      .text(function(d){
+        return d["Scheduled Date"].format("ddd, MMMM Do")
+      })
+
+    truck.append("div")
+      .attr("class", function(d){
+        if(d.hasOwnProperty("Restaurant drop")){
+          return "truckType drop"
+        }else{
+          return "truckType truck"
+        }
+      })
+      .html(function(d){
+        if(d.hasOwnProperty("Restaurant drop")){
+          return "Restaurant Drop <span>:: Parkside Headquarters, 9500 Brunett Avenue</span>"
+        }else{
+          return "Truck <span>:: Parkside Headquarters, 9500 Brunett Avenue</span>"
+        }
+      })
+      .on("mouseover", function(event, d){
+        var w = (d.hasOwnProperty("Restaurant drop") ? 411 : 335)
+        d3.select(this).select("span").transition().style("opacity",1)
+        d3.select(this)
+          .transition()
+          .style("width", w + "px")
+      })
+      .on("mouseout", function(event, d){
+        var w = (d.hasOwnProperty("Restaurant drop") ? 106 : 35)
+        d3.select(this).select("span").transition().style("opacity",0)
+        d3.select(this)
+          .transition()
+          .style("width", w + "px")
+      })
+
+    truck.append("div")
+      .attr("class", "time")
+      .html(function(d){
+        var h = ""
+        if(d.hasOwnProperty("Start time")) h += d["Start time"]
+        if(d.hasOwnProperty("End time")) h += "&ndash;" + d["End time"]
+        return h
+      })
+
+    truck.append("div")
+      .attr("class", "preorder")
+      .html(function(d){
+        if(d.hasOwnProperty("Preorder link")) return "<a href = \"" + d["Preorder link"] + "\" target = \"_blank\">" + "Preorder now!" + "</a>"
+        else return ""
+      })
+      .style("display", function(d){
+        return (d.hasOwnProperty("Preorder link")) ? "inline-block" : "none";
+      })
+
+    truck.append("div")
+      .attr("class", "truckNote")
+      .html(function(d){
+        return (d.hasOwnProperty("Note")) ? d.Note : ""
+      })
+      .style("display", function(d){
+        return (d.hasOwnProperty("Note")) ? 'block' : "none"
+      })
+
+    truck.append("div")
+      .attr("class", "calContainer")
+      .attr("id", function(d,i){
+        return "calCon-" + i
+      })
+      .style("top", function(d){
+        if(d.hasOwnProperty("Note")){
+          if(d.hasOwnProperty("Start time")){
+            return "-39px"
+          }else{
+            return "-64px"
+          }
+        }else{
+          return "0px"
+        }
+      })
+
+
+      // var L = data.length
+      for(var i = 0; i<data.length; i++){
+        var d = data[i],
+            title = d.hasOwnProperty("Restaurant drop") ? d["Food truck"] + " food truck, North Hills" : d["Food truck"] + " restaurant drop, North Hills",
+            calData = {
+              title: title,     // Event title
+              address: 'Parkside Headquarters, 9500 Brunett Avenue',
+            } 
+
+            var desc = "",
+                icsDesc = ""
+            if(d.hasOwnProperty("Truck website")){
+              desc += "Vendor's website:\n" + d["Truck website"]
+              icsDesc += "Vendor's website:\\n" + d["Truck website"]
+            }
+            if(d.hasOwnProperty("Preorder link")){
+              desc += "\n\nPreorder here:\n" + d["Preorder link"]
+              icsDesc += "\\n\\nPreorder here:\\n" + d["Preorder link"]
+            }
+            if(d.hasOwnProperty("Note")){
+              desc += "\n\nNote:\n" + d["Note"]
+              icsDesc += "\\n\\nNote:\\n" + d["Note"]
+            }
+
+
+            calData.description = desc
+            calData.icsDescription = icsDesc
+
+
+            if(d.hasOwnProperty("Start time")){
+              var t = d["Start time"],
+              pm = t.search("PM") != -1
+              var h;
+              if(pm){
+                h = +t.replace(" PM","").split(":")[0] + 12
+              }else{
+                h = +t.replace(" PM","").split(":")[0]
+              }
+              var m = +t.replace(" PM","").split(":")[1]
+              
+              var startDate = d["Scheduled Date"]
+              console.log(h, m)
+              startDate.hour(h)
+              startDate.minute(m)
+              calData["start"] = startDate.toDate()
+            }else{
+              var startDate = d["Scheduled Date"]
+              startDate.hour(5+12)
+              startDate.minute(0)
+              calData["start"] = startDate.toDate()
+            }
+
+
+            if(d.hasOwnProperty("End time")){
+              var t = d["End time"],
+              pm = t.search("PM") != -1
+              var h;
+              if(pm){
+                h = +t.replace(" PM","").split(":")[0] + 12
+              }else{
+                h = +t.replace(" PM","").split(":")[0]
+              }
+              var m = +t.replace(" PM","").split(":")[1]
+              
+              var endDate = d["Scheduled Date"]
+              endDate.hour(h)
+              endDate.minute(m)
+              calData["end"] = endDate.toDate()
+            }else{
+              var endDate = d["Scheduled Date"]
+              endDate.hour(5+12+2)
+              endDate.minute(0)
+              calData["end"] = endDate.toDate()
+            }
+
+
+            // calData
+
+            //               start: new Date('June 15, 2013 19:00'),   // Event start date
+            //   end: new Date('June 15, 2013 23:00'),     // You can also choose to set an end time.
+
+            
+console.log(calData)
+
+        var myCalendar = createCalendar({
+          options: {
+            class: 'cal',
+            id: 'cal-' + i                               
+          },
+          data: calData
+        })
+        document.querySelector('#calCon-' + i).appendChild(myCalendar);
+
+      }
+
+
+
+});
+
+
+</script>
+<!-- <script src="https://spreadsheets.google.com/feeds/cells/1S5j1C5JdsWDolhoYdSMBJeXT9oNlC4McMHrtqYujAxs/1/public/values?alt=json-in-script&callback=doData"></script> -->
+
+
+</body>
+</html> 
