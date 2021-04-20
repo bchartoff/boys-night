@@ -88,6 +88,17 @@ body{
 }
 .movieContainer{
     margin-bottom: 70px;
+    position: relative;
+}
+#motherBox{
+    height: 400px;
+    overflow: hidden;
+    top: 10px;
+}
+.randContainer{
+    position: relative;
+    height: 400px;
+    /*padding-bottom: 200px;    */
 }
 
 #creditsTitle{
@@ -125,6 +136,44 @@ body{
     color: white;
     font-weight: normal;
     font-style: italic;
+    text-align: left;   
+    margin-left: 113px;
+}
+.blankIt{
+    display: inline-block;
+    width: 70px;
+    /* top: calc(50% - 45px); */
+    left: 20px;
+    top: 1px;
+    position: relative;
+    /* top: 0px; */
+    height: 100%;
+    /* float: left; */
+    position: absolute;
+}
+.randoContainer .blankIt{
+    top: 21px;
+}
+.blankIt img{
+    width: 100%;
+    border-radius: 100%;
+    border: 3px solid white;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+.name{
+    display: inline-block;
+    width: calc(100% - 140px);
+    text-align: left;
+    /* float: left; */
+    /* clear: both; */
+    font-size: 54px;
+    left: 47px;
+    position: relative;
+}
+.randContainer .name{
+    font-size: 70px;
 }
 @media (max-width:600px) and (orientation:portrait) { 
     #rotateContainer{

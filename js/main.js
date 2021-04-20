@@ -16,6 +16,14 @@ function getQueryString(name) {
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
+// from MDN https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+}
+
+
 function setBgPos(){
     var screenW = window.innerWidth,
         screenH = window.innerHeight
@@ -31,7 +39,6 @@ function setBgPos(){
         
         fullBgW = imgW*screenH/imgH
         fullBgH = screenH
-        console.log(fullBgW)
         d3.select("#bgContainer")
             .style("background-size", (screenH * imgW/imgH) + "px")
             .style("background-position", (screenW - imgW*(screenH * imgW/imgH)/imgW)*0.5 + "px " + 0 + "px")
@@ -49,7 +56,6 @@ function setBgPos(){
     }
 
     // var fullW = +d3.select('#bgContainer').style("background-size").replace("px","")
-    // console.log(fullW)
 
 
 
@@ -174,29 +180,38 @@ function zoomIn(scalar){
 }
 
 
-
+function pickRando(){
+    d3.select("#motherBox").style('display', 'block')
+    var n = d3.selectAll(".randContainer").nodes().length
+    var r = getRandomIntInclusive(0, n)
+    var el = d3.select(".randContainer")
+    var h = el.node().getBoundingClientRect().height
+    console.log(n, h, r)
+    el.transition()
+        .duration(2000)
+        .style("margin-top", (-1*r*h) + "px")    
+}
 function updateMovies(i, rando=false){
     if(rando){
         if(d3.select("#creditsTitle").html() == "Let's randomly pick a movie to watch:"){
-            var allShould = d3.selectAll(".movieContainer:not(.watched)").nodes()
-            var should = allShould[Math.floor(Math.random() * allShould.length)];
-            d3.selectAll(".movieContainer").style("display", "none")
-            d3.select(should).style("display","block")
+            // var allShould = d3.selectAll(".movieContainer:not(.watched)").nodes()
+            // var should = allShould[Math.floor(Math.random() * allShould.length)];
+            // d3.selectAll(".movieContainer").style("display", "none")
+            // d3.select(should).style("display","block")
+            pickRando()
 
         }
         return false
     }
     var channels = ["should","have","randoShould"]
-    
     channels = channels.concat(directors.filter(function(d){ return d != null } ))
 
     var channel = (i<0) ? channels[channels.length - i%channels.length ] : channels[ i%channels.length ]
-    // console.log(channel)
     window.scrollTo(0,0);
     d3.selectAll(".movieContainer").style("display", "none")
     var creditsTitle = ""
 
-
+    d3.select("#motherBox").style('display', 'none')
     if(channel == "should"){
         creditsTitle = "We Should Watch:"
         d3.selectAll(".movieContainer:not(.watched)").style("display","block")
@@ -206,10 +221,23 @@ function updateMovies(i, rando=false){
         d3.selectAll(".movieContainer.watched").style("display","block")
     }
     else if(channel == "randoShould"){
+        console.log("foo")
         creditsTitle = "Let's randomly pick a movie to watch:"
-        var allShould = d3.selectAll(".movieContainer:not(.watched)").nodes()
-        var should = allShould[Math.floor(Math.random() * allShould.length)];
-        d3.select(should).style("display","block")
+        pickRando()
+        // var allShould = d3.selectAll(".movieContainer:not(.watched)").nodes()
+        // var should = allShould[Math.floor(Math.random() * allShould.length)];
+        // d3.select(should).style("display","block")
+        // console.log(allShould, should.innerHTML)
+        // d3.select("#motherBox").style('display', 'block')
+        // var n = d3.selectAll(".randContainer").nodes().length
+        // var r = getRandomIntInclusive(0, n)
+        // var el = d3.select(".randContainer")
+        // var h = el.node().getBoundingClientRect().height
+        // console.log(n, h, r)
+        // el.transition()
+        //     .duration(2000)
+        //     .style("margin-top", (-1*r*h) + "px")
+
     }
     else if(channel[0] == "director"){
         creditsTitle = "We love movies by " + channel[1]
@@ -277,6 +305,19 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
             return d['Director']
         })
 
+    var checkBox = movie.append("div")
+        .attr("class", "blankIt")
+    
+    checkBox.append("img")
+        .attr("src","img/thankIt.png")
+        .style("opacity", function(d){
+            return d.hasOwnProperty('On the pod?') ? 1 : 0;
+        })
+    checkBox.append("img")
+        .attr("src","img/checkie.png")
+        .style("opacity", function(d){
+            return d.hasOwnProperty('Watched on') ? 1 : 0;
+        })        
     movie.append("div")
         .attr("class", "name")
         .html(function(d){
@@ -289,9 +330,47 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
             return (d.hasOwnProperty('Watched on')) ? "The boys watched this picture on " + d['Watched on'] : ""
         })
 
-    directors = data.map(function(d){
+
+    var rando = d3.select("#mainText")
+        .append("div")
+        .attr("id", "motherBox")
+        .style("display","none")
+        .selectAll(".randContainer")
+        .data(data.filter(function(o){ return o.hasOwnProperty("Watched on") == false}))
+        .enter()
+        .append("div")
+        .attr("class", function(d){
+            var watched = d.hasOwnProperty('Watched on') ? " watched" : "",
+                pod = d.hasOwnProperty('On the pod?') ? " pod" : ""
+            return 'randContainer' + watched + pod;
+        })
+        .attr("data-director", function(d){
+            return d['Director']
+        })
+
+    var checkBoxRando = rando.append("div")
+        .attr("class", "blankIt")
+    
+    checkBoxRando.append("img")
+        .attr("src","img/thankIt.png")
+        .style("opacity", function(d){
+            return d.hasOwnProperty('On the pod?') ? 1 : 0;
+        })
+       
+    rando.append("div")
+        .attr("class", "name")
+        .html(function(d){
+            return d["Movie name"] + " (" + d["Year"] + ")"
+        })
+
+
+    directorsRaw = data.map(function(d){
         return(d.hasOwnProperty("Director")) ? ["director", d["Director"]] : null
     })
+
+
+    let set  = new Set(directorsRaw.map(JSON.stringify));
+    directors = Array.from(set).map(JSON.parse);
 
     updateMovies(0)
 
