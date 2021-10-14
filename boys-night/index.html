@@ -1,0 +1,52 @@
+<canvas width="500" height="200" id="canv" />
+
+<script>
+const canvas = document.getElementById('canv');
+const ctx = canvas.getContext('2d');
+
+const w = canvas.width = document.body.offsetWidth;
+const h = canvas.height = document.body.offsetHeight;
+const cols = Math.floor(w / 20) + 1;
+const ypos = Array(cols).fill(0);
+const boysArray = ['B','0','Y','S',' ','N','1','G','H','T']
+
+ctx.fillStyle = '#000';
+ctx.fillRect(0, 0, w, h);
+
+
+let loopCount = 0;
+
+function matrix () {
+  ctx.fillStyle = '#0001';
+  ctx.fillRect(0, 0, w, h);
+  
+  ctx.fillStyle = '#0f0';
+  ctx.font = '15pt monospace';
+  
+  
+  let randLoop = loopCount + Math.random()*100
+  ypos.forEach((y, ind) => {
+
+    // console.log("ind", ind)
+    let text;
+    let rand = Math.random()
+
+    if(randLoop < 300 || rand < .1){
+        if(rand < .3) text = String.fromCharCode(Math.random() * 128 + 12449);
+        else if(rand < .6) text = String.fromCharCode(Math.random() * 10 + 48);
+        else text = String.fromCharCode(Math.random() * 128)
+            console.log(text)
+    }else{
+        text = boysArray[ind%boysArray.length]
+    }
+    const x = ind * 20;
+    ctx.fillText(text, x, y);
+    if (y > 100 + Math.random() * 10000) ypos[ind] = 0;
+    else ypos[ind] = y + 20;
+  });
+  loopCount += 1;
+}
+
+setInterval(matrix, 50);
+
+</script>
