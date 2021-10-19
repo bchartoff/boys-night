@@ -130,6 +130,16 @@ function setBgPos(){
         })
 
 
+    d3.select("#bnBox")
+        .style("width", tvW + "px")
+        .style("height", tvH + "px")
+        .style("left", ((fullBgW * 2408/imgW) - tvW - (fullBgW-screenW)*.5) + "px")
+        .style("top", ((fullBgH * 308/imgH) - tvH) + "px")
+        .on("click", function(){
+            window.open("https://docs.google.com/spreadsheets/d/1cpk9K-N6u67SVIYO5aE8oE_EGtLdHkILZHfsNmmfIG0/edit#gid=0", '_blank').focus();
+        })
+
+
 
 
 
@@ -146,6 +156,7 @@ function zoomIn(scalar){
     d3.select("#knobRing").style("display","block")
     d3.select("#knobRingVol").style("display","block")
     d3.select("#tvBox").style("display","none")
+    d3.select("#bnBox").style("display","none")
 
     var screenW = window.innerWidth,
         screenH = window.innerHeight  

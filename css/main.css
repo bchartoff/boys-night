@@ -70,7 +70,7 @@ body{
     border-radius: 100%;
     display: none;
 }
-#tvBox{
+#tvBox, #bnBox{
     position: fixed;
     cursor: pointer;
     z-index: 6;
@@ -83,7 +83,7 @@ body{
 #knobRingVol:hover{
     border: 3px solid #fdbf11;
 }
-#tvBox:hover{
+#tvBox:hover, #bnBox:hover{
     border: 3px solid #fdbf11;   
 }
 .movieContainer{
