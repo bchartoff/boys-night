@@ -247,44 +247,58 @@ function updateMovies(i, rando=false){
     d3.select("#creditsTitle").html(creditsTitle)
 }
 
-$.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_EGtLdHkILZHfsNmmfIG0/1/public/values?alt=json', function(allData) {
+
+
+var data_id = "1cpk9K-N6u67SVIYO5aE8oE_EGtLdHkILZHfsNmmfIG0",
+    sheet_id = "0"
+
+Papa.parse('https://docs.google.com/spreadsheets/d/' + data_id + '/pub?output=csv&gid=' + sheet_id, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                var d = results.data
+                buildSite(d)
+              }
+            })
+
+function buildSite(data) {
     // JSON result in `data` variable
-    var cells = allData.feed.entry,
-        headers = cells.filter(function(c){ return c.gs$cell.row == "1" }),
-        gdata = cells.filter(function(c){ return c.gs$cell.row != "1" })
+    // var cells = allData.feed.entry,
+    //     headers = cells.filter(function(c){ return c.gs$cell.row == "1" }),
+    //     gdata = cells.filter(function(c){ return c.gs$cell.row != "1" })
 
-    var data = [],
-        colMap = {},
-        rowData = {}
+    // var data = [],
+    //     colMap = {},
+    //     rowData = {}
 
-    for(var i = 0; i < headers.length; i++){
-      var h = headers[i]
+    // for(var i = 0; i < headers.length; i++){
+    //   var h = headers[i]
 
-      colMap[h.gs$cell.col] = h.gs$cell.$t
-    }
-
-
-    for(var i = 0; i < gdata.length; i++){
-      var c = gdata[i]
-      var row = c.gs$cell.row,
-          col = c.gs$cell.col,
-          val = c.gs$cell.$t
+    //   colMap[h.gs$cell.col] = h.gs$cell.$t
+    // }
 
 
-      if(!rowData.hasOwnProperty(row)){
-        rowData[row] = {}
-      }
-      rowData[row][colMap[col]] = val
-    }
+    // for(var i = 0; i < gdata.length; i++){
+    //   var c = gdata[i]
+    //   var row = c.gs$cell.row,
+    //       col = c.gs$cell.col,
+    //       val = c.gs$cell.$t
 
 
-    for (const rowNum in rowData) {
-      if (rowData.hasOwnProperty(rowNum)) {
-        var rowObj = rowData[rowNum]
-      data.push(rowObj)
+    //   if(!rowData.hasOwnProperty(row)){
+    //     rowData[row] = {}
+    //   }
+    //   rowData[row][colMap[col]] = val
+    // }
 
-      }
-    }
+
+    // for (const rowNum in rowData) {
+    //   if (rowData.hasOwnProperty(rowNum)) {
+    //     var rowObj = rowData[rowNum]
+    //   data.push(rowObj)
+
+    //   }
+    // }
 
     d3.select("#mainText")
         .append("div")
@@ -297,8 +311,8 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
         .enter()
         .append("div")
         .attr("class", function(d){
-            var watched = d.hasOwnProperty('Watched on') ? " watched" : "",
-                pod = d.hasOwnProperty('On the pod?') ? " pod" : ""
+            var watched = d["Watched on"] != "" ? " watched" : "",
+                pod = d["On the pod?"] != "" ? " pod" : ""
             return 'movieContainer' + watched + pod;
         })
         .attr("data-director", function(d){
@@ -311,12 +325,13 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
     checkBox.append("img")
         .attr("src","img/thankIt.png")
         .style("opacity", function(d){
-            return d.hasOwnProperty('On the pod?') ? 1 : 0;
+            console.log(d, d["On the pod?"])
+            return d["On the pod?"] != "" ? 1 : 0;
         })
     checkBox.append("img")
         .attr("src","img/checkie.png")
         .style("opacity", function(d){
-            return d.hasOwnProperty('Watched on') ? 1 : 0;
+            return d["Watched on"] != "" ? 1 : 0;
         })        
     movie.append("div")
         .attr("class", "name")
@@ -327,7 +342,7 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
     movie.append("div")
         .attr("class", "watchedOn")
         .html(function(d){
-            return (d.hasOwnProperty('Watched on')) ? "The boys watched this picture on " + d['Watched on'] : ""
+            return (d["Watched on"] != "") ? "The boys watched this picture on " + d['Watched on'] : ""
         })
 
 
@@ -336,12 +351,12 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
         .attr("id", "motherBox")
         .style("display","none")
         .selectAll(".randContainer")
-        .data(data.filter(function(o){ return o.hasOwnProperty("Watched on") == false}))
+        .data(data.filter(function(o){ return o["Watched on"] == ""}))
         .enter()
         .append("div")
         .attr("class", function(d){
-            var watched = d.hasOwnProperty('Watched on') ? " watched" : "",
-                pod = d.hasOwnProperty('On the pod?') ? " pod" : ""
+            var watched = d['Watched on'] != '' ? " watched" : "",
+                pod = d["On the pod?"] != "" ? " pod" : ""
             return 'randContainer' + watched + pod;
         })
         .attr("data-director", function(d){
@@ -354,7 +369,7 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
     checkBoxRando.append("img")
         .attr("src","img/thankIt.png")
         .style("opacity", function(d){
-            return d.hasOwnProperty('On the pod?') ? 1 : 0;
+            return d["On the pod?"] != "" ? 1 : 0;
         })
        
     rando.append("div")
@@ -365,7 +380,7 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
 
 
     directorsRaw = data.map(function(d){
-        return(d.hasOwnProperty("Director")) ? ["director", d["Director"]] : null
+        return(d["Director"] != "") ? ["director", d["Director"]] : null
     })
 
 
@@ -374,7 +389,7 @@ $.getJSON('https://spreadsheets.google.com/feeds/cells/1cpk9K-N6u67SVIYO5aE8oE_E
 
     updateMovies(0)
 
-})
+}
 
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
