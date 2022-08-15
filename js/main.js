@@ -116,7 +116,6 @@ function setBgPos(){
             volRotateCount -= 1;
             d3.select("#knobsContainerVol").style("transform", "rotate(" + volRotateCount*20 + "deg)")
             updateMovies(0, true)
-            // updateMovies(rotateCount)
         });
 
 
@@ -191,13 +190,18 @@ function zoomIn(scalar){
 }
 
 
-function pickRando(){
+function pickRando(short){
     d3.select("#motherBox").style('display', 'block')
-    var n = d3.selectAll(".randContainer").nodes().length
+    var n = (short != "short") ? d3.selectAll(".randContainer").nodes().length : d3.selectAll(".randContainer.shortie").nodes().length
     var r = getRandomIntInclusive(0, n)
     var el = d3.select(".randContainer")
     var h = el.node().getBoundingClientRect().height
-    console.log(n, h, r)
+    if(short == "short"){
+        d3.selectAll(".randContainer:not(.shortie)").style("display","none")
+    }else{
+        d3.selectAll(".randContainer:not(.shortie)").style("display","block")
+    }
+    console.log(n)
     el.transition()
         .duration(2000)
         .style("margin-top", (-1*r*h) + "px")    
@@ -205,16 +209,14 @@ function pickRando(){
 function updateMovies(i, rando=false){
     if(rando){
         if(d3.select("#creditsTitle").html() == "Let's randomly pick a movie to watch:"){
-            // var allShould = d3.selectAll(".movieContainer:not(.watched)").nodes()
-            // var should = allShould[Math.floor(Math.random() * allShould.length)];
-            // d3.selectAll(".movieContainer").style("display", "none")
-            // d3.select(should).style("display","block")
             pickRando()
-
+        }
+        if(d3.select("#creditsTitle").html() == "Let's randomly pick a short movie to watch:"){
+            pickRando("short")
         }
         return false
     }
-    var channels = ["should","have","randoShould"]
+    var channels = ["randoShouldShort","randoShould","should","have"]
     channels = channels.concat(directors.filter(function(d){ return d != null } ))
 
     var channel = (i<0) ? channels[channels.length - i%channels.length ] : channels[ i%channels.length ]
@@ -232,23 +234,12 @@ function updateMovies(i, rando=false){
         d3.selectAll(".movieContainer.watched").style("display","block")
     }
     else if(channel == "randoShould"){
-        console.log("foo")
         creditsTitle = "Let's randomly pick a movie to watch:"
         pickRando()
-        // var allShould = d3.selectAll(".movieContainer:not(.watched)").nodes()
-        // var should = allShould[Math.floor(Math.random() * allShould.length)];
-        // d3.select(should).style("display","block")
-        // console.log(allShould, should.innerHTML)
-        // d3.select("#motherBox").style('display', 'block')
-        // var n = d3.selectAll(".randContainer").nodes().length
-        // var r = getRandomIntInclusive(0, n)
-        // var el = d3.select(".randContainer")
-        // var h = el.node().getBoundingClientRect().height
-        // console.log(n, h, r)
-        // el.transition()
-        //     .duration(2000)
-        //     .style("margin-top", (-1*r*h) + "px")
-
+    }
+    else if(channel == "randoShouldShort"){
+        creditsTitle = "Let's randomly pick a short movie to watch:"
+        pickRando("short")
     }
     else if(channel[0] == "director"){
         creditsTitle = "We love movies by " + channel[1]
@@ -336,7 +327,6 @@ function buildSite(data) {
     checkBox.append("img")
         .attr("src","img/thankIt.png")
         .style("opacity", function(d){
-            console.log(d, d["On the pod?"])
             return d["On the pod?"] != "" ? 1 : 0;
         })
     checkBox.append("img")
@@ -347,7 +337,7 @@ function buildSite(data) {
     movie.append("div")
         .attr("class", "name")
         .html(function(d){
-            return d["Movie name"] + " (" + d["Year"] + ")"
+            return d["Movie name"] + " (" + d["Year"] + ")<span class=\"runtime\">" + d["Runtime"]+ " minutes</span>"
         })
 
     movie.append("div")
@@ -367,8 +357,9 @@ function buildSite(data) {
         .append("div")
         .attr("class", function(d){
             var watched = d['Watched on'] != '' ? " watched" : "",
-                pod = d["On the pod?"] != "" ? " pod" : ""
-            return 'randContainer' + watched + pod;
+                pod = d["On the pod?"] != "" ? " pod" : "",
+                shortie = +d["Runtime"] <= 100 ? " shortie" : ""
+            return 'randContainer' + watched + pod + shortie;
         })
         .attr("data-director", function(d){
             return d['Director']
@@ -386,7 +377,7 @@ function buildSite(data) {
     rando.append("div")
         .attr("class", "name")
         .html(function(d){
-            return d["Movie name"] + " (" + d["Year"] + ")"
+            return d["Movie name"] + " (" + d["Year"] + ")<span class=\"runtime\">" + d["Runtime"]+ " minutes</span>"
         })
 
 

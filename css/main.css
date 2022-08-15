@@ -102,7 +102,7 @@ body{
 }
 
 #creditsTitle{
-    font-size: 69px;
+    font-size: 49px;
     margin-bottom: 80px;
     margin-top: 40px;
 }
@@ -172,8 +172,13 @@ body{
     left: 47px;
     position: relative;
 }
+.runtime{
+    display: block;
+    font-size: 0.5em !important;
+    -webkit-text-stroke: 1px white;
+}
 .randContainer .name{
-    font-size: 70px;
+    font-size: 50px;
 }
 @media (max-width:600px) and (orientation:portrait) { 
     #rotateContainer{
